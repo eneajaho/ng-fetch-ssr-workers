@@ -1,14 +1,28 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  imports: [CommonModule],
+  template: `
+    <div>Angular Todos with Fetch & SSR & Workers</div>
+    <ul>
+      <li *ngFor="let todo of todos$ | async">
+        {{ todo.title }}
+      </li>
+    </ul>
+  `,
 })
 export class AppComponent {
-  title = 'ng-fetch-ssr-workers';
+  http = inject(HttpClient);
+
+  todos$ = this.getTodos();
+
+  getTodos() {
+    return this.http.get<{ id: string; title: string }[]>(
+      'https://jsonplaceholder.typicode.com/todos'
+    );
+  }
 }
